@@ -42,7 +42,7 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
         await bot.EditMessageTextAsync(
             chatId,
             update.CallbackQuery.Message.MessageId,
-            "Работал ли ты до этого в IT?",
+            BotMessages.NotStudentMessage,
             parseMode: ParseMode.MarkdownV2,
             replyMarkup: markup);
     }   
@@ -51,8 +51,11 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
         var userChoice = BotHelper.GetMessage(update);
         if (userChoice == "Yes")
         {
-            await bot.SendTextMessageAsync(chatId, BotMessages.IntroduceYourself,
-                parseMode: ParseMode.MarkdownV2);
+            var replyMarkup = new ReplyKeyboardRemove();
+            await bot.SendTextMessageAsync(chatId, 
+                BotMessages.IntroduceYourself,
+                parseMode: ParseMode.MarkdownV2,
+                replyMarkup: replyMarkup);
         }
         else if (userChoice == "No")
         {
@@ -63,7 +66,9 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
                 new []{ InlineKeyboardButton.WithCallbackData(BotMessages.MainMenuButton, BotChatCommands.MainMenu)}
             };
             var markup = new InlineKeyboardMarkup(buttons);
-            await bot.SendTextMessageAsync(chatId, BotMessages.TraineeITMan,
+            await bot.SendPhotoAsync(chatId, 
+                caption: BotMessages.TraineeITMan,
+                photo: InputFile.FromStream(System.IO.File.OpenRead("Scenarios\\Images\\Есть контакт.jpg")),
                 parseMode: ParseMode.MarkdownV2,
                 replyMarkup: markup);
         }
@@ -78,8 +83,9 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
         userData.Fullname = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
         
-        await bot.SendTextMessageAsync(chatId, BotMessages.HowToContact,
-            parseMode: ParseMode.MarkdownV2);
+        var markup = new ReplyKeyboardMarkup(Directions.GetDirectionsKeyBoard());
+        await bot.SendTextMessageAsync(chatId, BotMessages.InterestingDirection,
+            parseMode: ParseMode.MarkdownV2, replyMarkup: markup);
     }
     private async Task StepAction3(ITelegramBotClient bot, Update update, long chatId)
     {
@@ -88,11 +94,14 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
             .Where(u => u.UserId == user.Id)
             .OrderByDescending(d => d.Id)
             .First();
-        userData.Contact = BotHelper.GetMessage(update);
+        userData.SomeField = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
         
-        await bot.SendTextMessageAsync(chatId, BotMessages.TellAboutITExpirience,
-            parseMode: ParseMode.MarkdownV2);
+        var markup = new ReplyKeyboardMarkup(Directions.GetDirectionsKeyBoard());
+        await bot.SendTextMessageAsync(chatId, 
+            BotMessages.TellAboutITExpirience,
+            parseMode: ParseMode.MarkdownV2,
+            replyMarkup: markup);
     }
 
     private async Task StepAction4(ITelegramBotClient bot, Update update, long chatId)
@@ -104,18 +113,47 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
             .First();
         userData.Experience = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
+        
+        await bot.SendTextMessageAsync(chatId, 
+            BotMessages.HowToContact,
+            parseMode: ParseMode.MarkdownV2);
+    }
+
+    private async Task StepAction5(ITelegramBotClient bot, Update update, long chatId)
+    {
+        var user = BotHelper.GetUserInfo(update);
+        var userData = BotDbContext.Instance.UserDatas
+            .Where(u => u.UserId == user.Id)
+            .OrderByDescending(d => d.Id)
+            .First();
+        userData.Contact = BotHelper.GetMessage(update);
+        await BotDbContext.Instance.SaveChangesAsync();
 
         var sheetManager = new GoogleSheetsManager();
-        sheetManager.AddUserToInterviewSheet(userData.Fullname, userData.Contact, userData.Experience, userData.TelegramName);
+        sheetManager.AddUserToInterviewSheet(userData.Fullname, userData.Contact, userData.SomeField, userData.Experience, userData.TelegramName);
 
         var buttons = new List<InlineKeyboardButton[]>
         {
-            new[] { InlineKeyboardButton.WithUrl(BotMessages.DirectumStudentsVK, "https://vk.com/student_directum") },
+            new[] { InlineKeyboardButton.WithUrl(BotMessages.DirectumCompanyVK, "https://vk.com/directum_people") },
             new[] { InlineKeyboardButton.WithCallbackData(BotMessages.MainMenuButton, BotChatCommands.MainMenu) }
         };
         var markup = new InlineKeyboardMarkup(buttons);
-        await bot.SendTextMessageAsync(chatId, BotMessages.ThankYouAlumnus, replyMarkup: markup,
-            parseMode: ParseMode.MarkdownV2);
+        if (Directions.AllDirections.Contains(userData.SomeField))
+        {
+            await bot.SendPhotoAsync(chatId, 
+                caption: string.Format(BotMessages.WaitingForYou, Directions.GetDirectionAlias(userData.SomeField)),
+                photo: InputFile.FromStream(System.IO.File.OpenRead($"Scenarios\\Images\\{Directions.GetDirectionAlias(userData.SomeField)}.jpg")),
+                replyMarkup: markup,
+                parseMode: ParseMode.MarkdownV2);
+        }
+        else
+        {
+            await bot.SendPhotoAsync(chatId, 
+                caption: BotMessages.ThankYouInITAnother,
+                photo: InputFile.FromStream(System.IO.File.OpenRead("Scenarios\\Images\\Есть контакт.jpg")),
+                replyMarkup: markup,
+                parseMode: ParseMode.MarkdownV2);
+        }
     }
     public StudentWorkScenario()
     {
@@ -126,6 +164,7 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
             new (StepAction2),
             new (StepAction3),
             new (StepAction4),
+            new (StepAction5),
 
         }.GetEnumerator();
     }

@@ -52,12 +52,12 @@ internal class Program
             },
             ThrowPendingUpdates = true
         };
-        bot.StartReceiving<EmptyBotUpdateHandler>(receiverOptions: opts);
+        bot.StartReceiving<BotUpdateHandler>(receiverOptions: opts);
         
        
         // BroadcastMessageDbContext.Instance.InitBroadcastUsers(users);
         // BroadcastMessageSender.BroadcastMessage(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup);
         // BroadcastMessageSender.BroadcastMessageWithPhoto(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup, InputFile.FromStream(stream));
-        BroadcastMessageSender.BroadcastMessageWithPhoto(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup, "qa_meetup.png");
+        // BroadcastMessageSender.BroadcastMessageWithPhoto(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup, "qa_meetup.png");
     }
 } 

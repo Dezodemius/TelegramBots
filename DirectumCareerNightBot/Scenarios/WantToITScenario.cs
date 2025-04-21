@@ -6,6 +6,7 @@ using BotCommon;
 using BotCommon.Scenarios;
 using DirectumCareerNightBot.GoogleSheets;
 using Telegram.Bot;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -34,11 +35,12 @@ internal class WantToITScenario : AutoStepBotCommandScenario
         BotDbContext.Instance.UserDatas.Add(userData);
         await BotDbContext.Instance.SaveChangesAsync();
 
-        await bot.EditMessageTextAsync(
+        var replyMarkup = new ReplyKeyboardRemove();
+        await bot.SendTextMessageAsync(
             chatId,
-            update.CallbackQuery.Message.MessageId,
             BotMessages.IntroduceYourself,
-            parseMode: ParseMode.MarkdownV2);
+            parseMode: ParseMode.MarkdownV2,
+            replyMarkup: replyMarkup);
     }
     public async Task StepAction2(ITelegramBotClient bot, Update update, long chatId)
     {
@@ -50,7 +52,8 @@ internal class WantToITScenario : AutoStepBotCommandScenario
         userData.Fullname = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
         
-        await bot.SendTextMessageAsync(chatId, BotMessages.HowToContact,
+        await bot.SendTextMessageAsync(chatId, 
+            BotMessages.HowToContact,
             parseMode: ParseMode.MarkdownV2);
     }
     public async Task StepAction3(ITelegramBotClient bot, Update update, long chatId)
@@ -62,9 +65,12 @@ internal class WantToITScenario : AutoStepBotCommandScenario
             .First();
         userData.Contact = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
-        
-        await bot.SendTextMessageAsync(chatId, BotMessages.TellAboutLastWork,
-            parseMode: ParseMode.MarkdownV2);
+
+        var replyMarkup = new ReplyKeyboardMarkup(Directions.GetDirectionsKeyBoard());
+        await bot.SendTextMessageAsync(chatId, 
+            BotMessages.InterestingDirection,
+            parseMode: ParseMode.MarkdownV2,
+            replyMarkup: replyMarkup);
     }
     public async Task StepAction4(ITelegramBotClient bot, Update update, long chatId)
     {
@@ -75,9 +81,12 @@ internal class WantToITScenario : AutoStepBotCommandScenario
             .First();
         userData.SomeField = BotHelper.GetMessage(update);
         await BotDbContext.Instance.SaveChangesAsync();
-        
-        await bot.SendTextMessageAsync(chatId, BotMessages.WhatYouAlreadyLearned,
-            parseMode: ParseMode.MarkdownV2);
+
+        var replyMarkup = new ReplyKeyboardRemove();
+        await bot.SendTextMessageAsync(chatId, 
+            BotMessages.TellAboutLastWork,
+            parseMode: ParseMode.MarkdownV2, 
+            replyMarkup: replyMarkup);
     }
     public async Task StepAction5(ITelegramBotClient bot, Update update, long chatId)
     {
@@ -94,10 +103,14 @@ internal class WantToITScenario : AutoStepBotCommandScenario
 
         var buttons = new List<InlineKeyboardButton[]>
         {
-            new[] { InlineKeyboardButton.WithCallbackData(BotMessages.MainMenuButton, BotChatCommands.MainMenu) }
+            new[] { InlineKeyboardButton.WithUrl(BotMessages.DirectumStudentsVK, "https://vk.com/student_directum") },
+            new[] { InlineKeyboardButton.WithCallbackData(BotMessages.MainMenuButton, BotChatCommands.MainMenu) },
         };
         var markup = new InlineKeyboardMarkup(buttons);
-        await bot.SendTextMessageAsync(chatId, BotMessages.ThankYouInITDept, replyMarkup: markup,
+        await bot.SendPhotoAsync(chatId, 
+            caption: BotMessages.GoUpInIT, 
+            photo: InputFile.FromStream(System.IO.File.OpenRead("Scenarios\\Images\\Попасть в IT.jpg")),
+            replyMarkup: markup,
             parseMode: ParseMode.MarkdownV2);
     }
     public WantToITScenario()

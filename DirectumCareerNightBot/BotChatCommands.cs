@@ -9,7 +9,7 @@ public class BotChatCommands
     public const string StudentWithExperience = "StudentWithExperience";
     public const string WantToIT = "WantToIT";
     public const string Directum15Questions = "Directum15Questions";
-    public const string RafflePrizes = "RafflePrizes";
+    public const string Quiz = "Quiz";
     public const string Student = "Student";
     public const string NotStudent = "NotStudent";
     public const string WorkInIt = "WorkInIt";

@@ -57,8 +57,7 @@ public class BotUpdateHandler : IUpdateHandler
                 var replyMarkup = MainMenuCommand.GetMainMenuInlineMarkup();
                 if (update.Type == UpdateType.CallbackQuery)
                 {
-                    await botClient.EditMessageTextAsync(userId,
-                        update.CallbackQuery.Message.MessageId,
+                    await botClient.SendTextMessageAsync(userId,
                         BotMessages.MainMenu,
                         replyMarkup: replyMarkup,
                         cancellationToken: cancellationToken,
@@ -138,16 +137,15 @@ public class BotUpdateHandler : IUpdateHandler
                     }
                 };
                 var markup = new InlineKeyboardMarkup(buttons);
-                await botClient.EditMessageTextAsync(
-                    userId,
-                    update.CallbackQuery.Message.MessageId,
-                    BotMessages.Directum15QuestionsMessage,
+                await botClient.SendPhotoAsync(userId,
+                    caption: BotMessages.TraineeITMan,
+                    photo: InputFile.FromStream(System.IO.File.OpenRead("Scenarios\\Images\\Есть контакт.jpg")),
                     replyMarkup: markup,
                     cancellationToken: cancellationToken,
                     parseMode: ParseMode.MarkdownV2);
                 break;
             }
-            case BotChatCommands.RafflePrizes:
+            case BotChatCommands.Quiz:
                 userScenario = new UserCommandScenario(userId, new QuizScenario());
                 break;
         }
