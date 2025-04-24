@@ -42,7 +42,7 @@ public class StudentWorkScenario : AutoStepBotCommandScenario
         await bot.EditMessageTextAsync(
             chatId,
             update.CallbackQuery.Message.MessageId,
-            BotMessages.NotStudentMessage,
+            BotMessages.StudentToWork,
             parseMode: ParseMode.MarkdownV2,
             replyMarkup: markup);
     }   

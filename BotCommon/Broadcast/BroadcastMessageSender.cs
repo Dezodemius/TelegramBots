@@ -36,7 +36,7 @@ public static class BroadcastMessageSender
         BroadcastMessageDbContext.Instance.BroadcastMessageUsers.Add(broadcastMessageUser);
         await BroadcastMessageDbContext.Instance.SaveChangesAsync();
 
-        LogManager.GetCurrentClassLogger().Debug($"{i + 1}/{userList.Count} Message sent to: {botUser.Id}");
+        LogManager.GetCurrentClassLogger().Debug($"{i + 1}/{userList.Count} Message sent to: {botUser.Id} ({BotHelper.GetUsername(botUser)})");
       }
       catch (ApiRequestException e) when (e.ErrorCode == (int)HttpStatusCode.Forbidden)
       {

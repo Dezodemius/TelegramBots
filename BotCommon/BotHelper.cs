@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using BotCommon.Repository;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace BotCommon;
@@ -21,6 +22,13 @@ public static class BotHelper
     }
 
     public static string GetUsername(User user)
+    {
+        return string.IsNullOrEmpty(user.Username)
+            ? $"{user.FirstName} {user.LastName}"
+            : user.Username;
+    }
+    
+    public static string GetUsername(BotUser user)
     {
         return string.IsNullOrEmpty(user.Username)
             ? $"{user.FirstName} {user.LastName}"

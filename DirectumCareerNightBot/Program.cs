@@ -54,10 +54,11 @@ internal class Program
         };
         bot.StartReceiving<BotUpdateHandler>(receiverOptions: opts);
         
-       
-        // BroadcastMessageDbContext.Instance.InitBroadcastUsers(users);
-        // BroadcastMessageSender.BroadcastMessage(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup);
-        // BroadcastMessageSender.BroadcastMessageWithPhoto(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup, InputFile.FromStream(stream));
-        // BroadcastMessageSender.BroadcastMessageWithPhoto(bot, BotDbContext.Instance.BotUsers, BotMessages.DirectumTestersMeetup, "qa_meetup.png");
+       var senderWith1830 = new ScheduledMessageSender(bot, new DateTime(2025, 04, 25, 18, 25, 00), string.Format(BotMessages.BroadcastMessage, "18:30"));
+       senderWith1830.Start();
+       var senderWith1900 = new ScheduledMessageSender(bot, new DateTime(2025, 04, 25,18, 55, 00), string.Format(BotMessages.BroadcastMessage, "19:00"));
+       senderWith1900.Start();   
+       var senderWith2000 = new ScheduledMessageSender(bot, new DateTime(2025, 04, 25, 19, 55, 00), string.Format(BotMessages.BroadcastMessage, "20:00"));
+       senderWith2000.Start();
     }
 } 
